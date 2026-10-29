@@ -1,25 +1,66 @@
 {
+  "id": "/omniconvert/",
   "name": "OmniConvert Pro & HVAC Calc",
   "short_name": "OmniConvert",
   "description": "Kalkulator konversi satuan otomatis lengkap dan kalkulator HVAC Cooling Load & Velocity",
   "start_url": "/omniconvert/",
   "scope": "/omniconvert/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
+  "orientation": "portrait-primary",
   "background_color": "#090d16",
   "theme_color": "#2563eb",
-  "orientation": "portrait-primary",
+  "lang": "id",
+  "dir": "ltr",
+  "categories": ["utilities", "productivity", "education"],
   "icons": [
     {
       "src": "https://img.icons8.com/ios-filled/192/38bdf8/speed.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "https://img.icons8.com/ios-filled/512/38bdf8/speed.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://img.icons8.com/ios-filled/512/38bdf8/speed.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kalkulator Satuan",
+      "short_name": "Satuan",
+      "description": "Buka kalkulator konversi satuan otomatis",
+      "url": "/omniconvert/",
+      "icons": [
+        {
+          "src": "https://img.icons8.com/ios-filled/192/38bdf8/speed.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://img.icons8.com/ios-filled/512/38bdf8/speed.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tampilan Mobile OmniConvert Pro"
+    },
+    {
+      "src": "https://img.icons8.com/ios-filled/512/38bdf8/speed.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tampilan Desktop OmniConvert Pro"
     }
   ]
 }
