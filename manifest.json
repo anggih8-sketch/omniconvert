@@ -1,0 +1,25 @@
+{
+  "name": "OmniConvert Pro & HVAC Calc",
+  "short_name": "OmniConvert",
+  "description": "Kalkulator konversi satuan otomatis lengkap dan kalkulator HVAC Cooling Load & Velocity",
+  "start_url": "/omniconvert/",
+  "scope": "/omniconvert/",
+  "display": "standalone",
+  "background_color": "#0b1329",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8983/8983163.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8983/8983163.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
