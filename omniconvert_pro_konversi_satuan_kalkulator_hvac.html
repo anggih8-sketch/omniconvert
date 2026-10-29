@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#090d16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="OmniConvert Pro" />
+  <title>OmniConvert Pro - Kalkulator Konversi Satuan & HVAC</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfeff',
+              100: '#cffafe',
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2',
+              700: '#0e7490'
+            },
+            accent: {
+              500: '#6366f1',
+              600: '#4f46e5'
+            },
+            surface: {
+              900: '#090d16',
+              850: '#0f172a',
+              800: '#1e293b',
+              700: '#334155'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar & Touch Optimization */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .touch-scroll-x {
+      overflow-x: auto;
+      touch-action: pan-x;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .light .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    /* Active ripple animation simulation */
+    .btn-touch:active {
+      transform: scale(0.97);
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="bg-surface-900 text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-300">
+
+  <!-- Container Mobile Shell Frame -->
+  <div class="max-w-md mx-auto min-h-screen flex flex-col relative pb-24 shadow-2xl bg-surface-900/90 border-x border-slate-800/60">
+
+    <!-- TOP APP BAR -->
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-500 to-accent-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/25">
+          <i data-lucide="gauge" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+            OmniConvert <span class="text-[10px] bg-brand-500/20 text-brand-400 font-mono px-1.5 py-0.5 rounded border border-brand-500/30">PRO</span>
+          </h1>
+          <p class="text-[11px] text-slate-400">Konversi Satuan & HVAC Suite</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons Header -->
+      <div class="flex items-center gap-1.5">
+        <!-- Precision Selector -->
+        <div class="relative">
+          <select id="precisionSelect" class="bg-surface-800 text-slate-300 text-xs font-mono font-medium py-1.5 pl-2 pr-6 rounded-lg border border-slate-700/80 focus:outline-none focus:border-brand-500 appearance-none cursor-pointer">
+            <option value="auto">Auto Dec</option>
+            <option value="2">.00 (2 Dec)</option>
+            <option value="4" selected>.0000 (4 Dec)</option>
+            <option value="6">.000000 (6 Dec)</option>
+          </select>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 absolute right-1.5 top-2.5 pointer-events-none"></i>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggle" type="button" aria-label="Toggle Theme" class="w-8 h-8 rounded-lg bg-surface-800 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center btn-touch">
+          <i data-lucide="sun" id="themeIconSun" class="w-4 h-4 hidden"></i>
+          <i data-lucide="moon" id="themeIconMoon" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- HORIZONTAL SWIPEABLE NAV PILLS -->
+    <nav class="sticky top-[57px] z-30 bg-surface-900/95 backdrop-blur-md border-b border-slate-800/80 py-2.5">
+      <div id="categoryContainer" class="flex gap-2 px-4 touch-scroll-x hide-scrollbar select-none cursor-grab active:cursor-grabbing">
+        <!-- Generated dynamically via JS for ultra-smooth drag/swipe -->
+      </div>
+    </nav>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 px-4 py-4 space-y-4">
+
+      <!-- ============================================== -->
+      <!-- SECTION 1: STANDAR UNIT CONVERTER -->
+      <!-- ============================================== -->
+      <div id="standardConverterView" class="space-y-4">
+
+        <!-- Input Card (From) -->
+        <div class="glass-card rounded-2xl p-4 shadow-xl relative overflow-hidden group">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
+              <i data-lucide="arrow-down-right" class="w-3.5 h-3.5 text-brand-400"></i> Nilai Input
+            </span>
+            <button id="clearInputBtn" class="text-[11px] text-slate-400 hover:text-rose-400 flex items-center gap-1 transition">
+              <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input
+              type="number"
+              id="inputValue"
+              value="1"
+              step="any"
+              inputmode="decimal"
+              placeholder="0"
+              class="w-full bg-surface-900/60 border border-slate-700/80 focus:border-brand-500 rounded-xl px-3 py-2.5 text-2xl font-bold font-mono text-white focus:outline-none transition shadow-inner"
+            />
+            <select
+              id="fromUnitSelect"
+              class="w-36 bg-surface-800 border border-slate-700/80 text-xs font-semibold text-white rounded-xl px-2 py-3.5 focus:outline-none focus:border-brand-500 truncate cursor-pointer shadow"
+            >
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Swap Floating Button -->
+        <div class="flex justify-center -my-2 relative z-10">
+          <button
+            id="swapUnitsBtn"
+            type="button"
+            aria-label="Tukar Satuan"
+            class="w-10 h-10 rounded-full bg-gradient-to-r from-brand-500 to-accent-600 text-white flex items-center justify-center shadow-lg shadow-brand-500/30 border-2 border-surface-900 hover:scale-105 btn-touch transition"
+          >
+            <i data-lucide="arrow-up-down" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Output Card (To) -->
+        <div class="glass-card rounded-2xl p-4 shadow-xl border-l-4 border-l-brand-500">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-brand-400 flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Hasil Konversi Target
+            </span>
+            <button id="copyResultBtn" class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 btn-touch">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Salin
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div
+              id="outputValue"
+              class="w-full bg-surface-900/60 border border-slate-700/80 rounded-xl px-3 py-2.5 text-2xl font-bold font-mono text-brand-300 select-all overflow-x-auto hide-scrollbar whitespace-nowrap"
+            >
+              0
+            </div>
+            <select
+              id="toUnitSelect"
+              class="w-36 bg-surface-800 border border-slate-700/80 text-xs font-semibold text-white rounded-xl px-2 py-3.5 focus:outline-none focus:border-brand-500 truncate cursor-pointer shadow"
+            >
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Conversion Table Grid (Semua Satuan Sekaligus) -->
+        <div class="glass-card rounded-2xl p-4 shadow-xl space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-brand-400"></i>
+              <span class="text-xs font-bold text-slate-200">Konversi Ke Semua Satuan</span>
+            </div>
+            <span class="text-[10px] text-slate-400 bg-surface-800 px-2 py-0.5 rounded-full font-mono">1-Klik Salin</span>
+          </div>
+
+          <div id="allUnitsGrid" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- SECTION 2: KALKULATOR VELOCITY PIPA & DUCT -->
+      <!-- ============================================== -->
+      <div id="pipeCalculatorView" class="hidden space-y-4">
+        <!-- Banner Modul -->
+        <div class="rounded-2xl p-4 bg-gradient-to-br from-indigo-950 via-surface-850 to-slate-900 border border-indigo-500/30 shadow-xl relative overflow-hidden">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400">
+                  <i data-lucide="gauge" class="w-4 h-4"></i>
+                </span>
+                <h2 class="text-sm font-bold text-white">Flow Velocity & Sizing ($v = Q / A$)</h2>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">Hitung kecepatan fluida air pipa atau udara ducting mekanikal.</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Mekanikal</span>
+          </div>
+        </div>
+
+        <!-- Tipe Geometri: Pipa Bulat vs Duct Persegi -->
+        <div class="flex bg-surface-800 p-1 rounded-xl gap-1 border border-slate-700/80">
+          <button id="geoRoundBtn" type="button" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-1.5">
+            <i data-lucide="circle" class="w-3.5 h-3.5"></i> Pipa / Duct Bulat
+          </button>
+          <button id="geoRectBtn" type="button" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+            <i data-lucide="square" class="w-3.5 h-3.5"></i> Duct Persegi (W x H)
+          </button>
+        </div>
+
+        <!-- Input Flow Rate (Q) -->
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <label class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+            <span>Laju Aliran / Debit Fluida ($Q$):</span>
+            <span class="text-[10px] text-indigo-400 font-mono">Flow Rate</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <input
+              type="number"
+              id="pipeFlowInput"
+              value="15"
+              step="any"
+              inputmode="decimal"
+              class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-3 py-2.5 text-lg font-bold font-mono text-white focus:outline-none focus:border-indigo-500"
+            />
+            <select id="pipeFlowUnit" class="w-32 bg-surface-800 border border-slate-700/80 text-xs font-semibold rounded-xl px-2 py-3 text-white focus:outline-none">
+              <option value="lps" selected>L/s (L/detik)</option>
+              <option value="lpm">LPM (L/min)</option>
+              <option value="m3h">m³/jam</option>
+              <option value="gpm">GPM (US)</option>
+              <option value="cfm">CFM (ft³/min)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Input Dimensi Penampang Pipa / Duct -->
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <label class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+            <span>Dimensi Penampang Saluran:</span>
+            <span class="text-[10px] text-indigo-400 font-mono">Internal Sizing</span>
+          </label>
+
+          <!-- Round Pipe Input -->
+          <div id="roundInputWrap" class="flex items-center gap-2">
+            <div class="flex-1 relative">
+              <span class="absolute left-3 top-3 text-xs text-slate-400 font-mono">Ø</span>
+              <input
+                type="number"
+                id="pipeDiameterInput"
+                value="100"
+                step="any"
+                inputmode="decimal"
+                class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl pl-8 pr-3 py-2.5 text-base font-bold font-mono text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <select id="pipeDiameterUnit" class="w-28 bg-surface-800 border border-slate-700/80 text-xs font-semibold rounded-xl px-2 py-3 text-white focus:outline-none">
+              <option value="mm" selected>mm (milimeter)</option>
+              <option value="inch">inch (inci)</option>
+              <option value="cm">cm</option>
+              <option value="m">meter</option>
+            </select>
+          </div>
+
+          <!-- Rectangular Duct Input (Hidden by default) -->
+          <div id="rectInputWrap" class="hidden grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-[11px] text-slate-400 mb-1 block">Lebar ($W$):</span>
+              <div class="flex items-center gap-1">
+                <input type="number" id="ductWidthInput" value="400" step="any" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-2.5 py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <span class="text-xs text-slate-400 font-mono">mm</span>
+              </div>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 mb-1 block">Tinggi ($H$):</span>
+              <div class="flex items-center gap-1">
+                <input type="number" id="ductHeightInput" value="250" step="any" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-2.5 py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <span class="text-xs text-slate-400 font-mono">mm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Luas Penampang -->
+          <div class="text-[11px] text-slate-400 pt-1 flex items-center justify-between border-t border-slate-800">
+            <span>Luas Area Saluran ($A$): <strong id="calcCrossArea" class="font-mono text-white">0.00785 m²</strong></span>
+            <span id="flowContextBadge" class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-mono">Water Pipe</span>
+          </div>
+        </div>
+
+        <!-- Hasil Kecepatan (Velocity Results) -->
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <i data-lucide="gauge" class="w-4 h-4 text-indigo-400"></i>
+              Kecepatan Aliran ($v$):
+            </span>
+            <span id="velocityStatusTag" class="text-[10px] font-semibold px-2 py-0.5 rounded">Optimal</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3">
+              <span class="text-[11px] font-semibold text-indigo-300">Meter / Detik</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="velResMS" class="text-xl font-bold font-mono text-white">0.00</span>
+                <span class="text-xs text-slate-400 font-mono">m/s</span>
+              </div>
+            </div>
+
+            <div class="bg-surface-800 border border-slate-700/80 rounded-xl p-3">
+              <span class="text-[11px] font-semibold text-slate-300">Feet / Menit (FPM)</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="velResFPM" class="text-base font-bold font-mono text-white">0</span>
+                <span class="text-xs text-slate-400 font-mono">ft/min</span>
+              </div>
+            </div>
+
+            <div class="bg-surface-800 border border-slate-700/80 rounded-xl p-3">
+              <span class="text-[11px] font-semibold text-slate-300">Feet / Detik</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="velResFPS" class="text-base font-bold font-mono text-white">0.00</span>
+                <span class="text-xs text-slate-400 font-mono">ft/s</span>
+              </div>
+            </div>
+
+            <div class="bg-surface-800 border border-slate-700/80 rounded-xl p-3">
+              <span class="text-[11px] font-semibold text-slate-300">Kilometer / Jam</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="velResKMH" class="text-base font-bold font-mono text-white">0.00</span>
+                <span class="text-xs text-slate-400 font-mono">km/j</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Standard Velocity Guideline Info -->
+          <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
+            <div class="flex justify-between">
+              <span>Standar Kecepatan Rekomendasi:</span>
+              <strong id="guidelineRangeText" class="text-indigo-400">1.2 - 2.4 m/s (Pipa Air Chiller)</strong>
+            </div>
+            <p id="guidelineFeedbackText" class="text-slate-400 text-[10px] leading-relaxed">
+              Kecepatan ideal mencegah erosi pipa dan menghindari beban friksi / head-loss pompa berlebih.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- SECTION 3: KALKULATOR COOLING LOAD (AC & CHILLER) -->
+      <!-- ============================================== -->
+      <div id="coolingCalculatorView" class="hidden space-y-4">
+        <!-- Banner Modul -->
+        <div class="rounded-2xl p-4 bg-gradient-to-br from-cyan-950 via-surface-850 to-slate-900 border border-cyan-500/30 shadow-xl">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
+                  <i data-lucide="snowflake" class="w-4 h-4"></i>
+                </span>
+                <h2 class="text-sm font-bold text-white">Cooling Load & AC Sizing</h2>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">Kalkulasi kapasitas pendinginan ruangan AC (PK) & sistem Chiller.</p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">HVAC Pro</span>
+          </div>
+        </div>
+
+        <!-- Tab Mode: Ruangan vs Chiller -->
+        <div class="flex bg-surface-800 p-1 rounded-xl gap-1 border border-slate-700/80">
+          <button id="clModeRoomBtn" type="button" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition flex items-center justify-center gap-1.5">
+            <i data-lucide="door-closed" class="w-3.5 h-3.5"></i> Beban Ruangan (AC Split)
+          </button>
+          <button id="clModeHydronicBtn" type="button" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+            <i data-lucide="waves" class="w-3.5 h-3.5"></i> Chiller / Air Dingin ($Q$)
+          </button>
+        </div>
+
+        <!-- FORM 1: BEBAN RUANGAN AC SPLIT -->
+        <div id="clRoomFormContainer" class="glass-card rounded-2xl p-4 space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Luas Ruangan:</label>
+              <div class="flex items-center gap-1">
+                <input type="number" id="clAreaVal" value="24" min="1" step="any" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-2.5 py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <select id="clAreaUnit" class="bg-surface-800 border border-slate-700/80 text-xs font-semibold rounded-xl px-2 py-2 text-white">
+                  <option value="m2" selected>m²</option>
+                  <option value="sqft">ft²</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Tinggi Plafon:</label>
+              <div class="flex items-center gap-1">
+                <input type="number" id="clHeightVal" value="3.0" min="1" step="0.1" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-2.5 py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <select id="clHeightUnit" class="bg-surface-800 border border-slate-700/80 text-xs font-semibold rounded-xl px-2 py-2 text-white">
+                  <option value="m" selected>m</option>
+                  <option value="ft">ft</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Fungsi / Tipe Ruangan:</label>
+            <select id="clPresetRoom" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none">
+              <option value="bedroom" selected>Kamar Tidur (Normal ~ 500-550 BTU/h/m²)</option>
+              <option value="living">Ruang Tamu / Keluarga (~ 600 BTU/h/m²)</option>
+              <option value="office">Kantor / Ruang Kerja (~ 700 BTU/h/m²)</option>
+              <option value="restaurant">Restoran / Kafe / Ritel (~ 850 BTU/h/m²)</option>
+              <option value="server">Server Room / Data Center (~ 1150 BTU/h/m²)</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Jumlah Orang:</label>
+              <div class="flex items-center bg-surface-900/70 border border-slate-700/80 rounded-xl px-2">
+                <input type="number" id="clPeopleCount" value="2" min="0" class="w-full bg-transparent py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <span class="text-xs text-slate-400">org</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Beban Alat (Watt):</label>
+              <div class="flex items-center bg-surface-900/70 border border-slate-700/80 rounded-xl px-2">
+                <input type="number" id="clWattsLoad" value="300" min="0" step="50" class="w-full bg-transparent py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <span class="text-xs text-slate-400">W</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Paparan Matahari & Kaca Jendela:</label>
+            <select id="clSunExposure" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none">
+              <option value="shaded">Teduh / Minim Kaca / Lantai Bawah (-10%)</option>
+              <option value="normal" selected>Normal / Sedang (Standar)</option>
+              <option value="sunny">Banyak Kaca / Sinar Sore Menghadap Barat (+15%)</option>
+              <option value="rooftop">Lantai Atas Tepat di Bawah Dak Cor / Seng (+25%)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- FORM 2: BEBAN CHILLER / HIDRONIK -->
+        <div id="clHydronicFormContainer" class="hidden glass-card rounded-2xl p-4 space-y-3">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Debit Air Chilled Water ($Q$):</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="clChillerFlowVal" value="100" min="0" step="any" class="w-full bg-surface-900/70 border border-slate-700/80 rounded-xl px-3 py-2 text-base font-bold font-mono text-white focus:outline-none" />
+              <select id="clChillerFlowUnit" class="w-32 bg-surface-800 border border-slate-700/80 text-xs font-semibold rounded-xl px-2 py-2.5 text-white">
+                <option value="gpm" selected>GPM (US)</option>
+                <option value="lpm">LPM (L/min)</option>
+                <option value="lps">L/s</option>
+                <option value="m3h">m³/jam</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Suhu Suplai (CHWS):</label>
+              <div class="flex items-center bg-surface-900/70 border border-slate-700/80 rounded-xl px-2">
+                <input type="number" id="clChwsTemp" value="7" step="0.5" class="w-full bg-transparent py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <span class="clTempSymbol text-xs font-mono font-bold text-cyan-400">°C</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 mb-1 block">Suhu Return (CHWR):</label>
+              <div class="flex items-center bg-surface-900/70 border border-slate-700/80 rounded-xl px-2">
+                <input type="number" id="clChwrTemp" value="12" step="0.5" class="w-full bg-transparent py-2 text-sm font-bold font-mono text-white focus:outline-none" />
+                <span class="clTempSymbol text-xs font-mono font-bold text-cyan-400">°C</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1">
+            <span class="text-slate-400">Skala Temperatur:</span>
+            <div class="flex gap-3">
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="clTempScale" value="C" checked class="text-cyan-500 focus:ring-cyan-500" />
+                <span class="ml-1 text-xs text-white">Celsius (°C)</span>
+              </label>
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="clTempScale" value="F" class="text-cyan-500 focus:ring-cyan-500" />
+                <span class="ml-1 text-xs text-white">Fahrenheit (°F)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- HASIL PERHITUNGAN COOLING CAPACITY -->
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+              Kapasitas Pendinginan Diperlukan:
+            </span>
+            <span id="clMethodTag" class="text-[10px] font-semibold text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-2 py-0.5 rounded">Beban Ruangan</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <!-- PK AC Standar Indonesia -->
+            <div class="bg-cyan-950/40 border border-cyan-500/30 rounded-xl p-3 flex flex-col justify-between">
+              <span class="text-[11px] font-semibold text-cyan-300">Kapasitas AC (PK / HP)</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="clResPkDisplay" class="text-xl font-bold font-mono text-white">0 PK</span>
+                <button class="clCopyBtn p-1 text-cyan-400 hover:text-cyan-200" data-target="clResPkDisplay" data-label="PK">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- BTU / hr -->
+            <div class="bg-surface-800 border border-slate-700/80 rounded-xl p-3 flex flex-col justify-between">
+              <span class="text-[11px] font-semibold text-slate-300">BTU / Jam (BTU/h)</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="clResBtuDisplay" class="text-base font-bold font-mono text-white">0</span>
+                <button class="clCopyBtn p-1 text-slate-400 hover:text-cyan-400" data-target="clResBtuDisplay" data-label="BTU/h">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Tons of Refrigeration (TR) -->
+            <div class="bg-surface-800 border border-slate-700/80 rounded-xl p-3 flex flex-col justify-between">
+              <span class="text-[11px] font-semibold text-slate-300">Ton Refrigeration (TR)</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="clResTrDisplay" class="text-base font-bold font-mono text-white">0 TR</span>
+                <button class="clCopyBtn p-1 text-slate-400 hover:text-cyan-400" data-target="clResTrDisplay" data-label="TR">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- kW Thermal -->
+            <div class="bg-surface-800 border border-slate-700/80 rounded-xl p-3 flex flex-col justify-between">
+              <span class="text-[11px] font-semibold text-slate-300">Kilowatt Pendingin (kW)</span>
+              <div class="flex items-center justify-between mt-1">
+                <span id="clResKwDisplay" class="text-base font-bold font-mono text-white">0 kW</span>
+                <button class="clCopyBtn p-1 text-slate-400 hover:text-cyan-400" data-target="clResKwDisplay" data-label="kW">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rekomendasi Pasar AC Indonesia -->
+          <div class="pt-2 border-t border-slate-800 text-xs space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Ukuran Unit AC Pasar:</span>
+              <strong id="clSuggestUnitText" class="text-cyan-400 font-bold">1.5 PK (~ 12.000 BTU/h)</strong>
+            </div>
+            <p id="clSuggestDescText" class="text-[11px] text-slate-400 leading-relaxed">
+              Kapasitas yang disarankan dengan safety factor pendinginan optimal tanpa membebani kompresor.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- FLOATING TOAST NOTIFICATION -->
+    <div id="toastNotification" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-800/95 text-white border border-slate-600/80 px-4 py-2 rounded-full shadow-2xl text-xs font-semibold flex items-center gap-2 pointer-events-none opacity-0 transition-opacity duration-300">
+      <i data-lucide="check" class="w-3.5 h-3.5 text-brand-400"></i>
+      <span id="toastMsg">Tersalin ke clipboard</span>
+    </div>
+
+    <!-- NATIVE-LIKE BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 max-w-md mx-auto glass-card border-t border-slate-800/80 py-2 px-6 flex items-center justify-around">
+      <button id="navTabConvert" type="button" class="flex flex-col items-center gap-1 text-brand-400 btn-touch">
+        <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Konversi</span>
+      </button>
+
+      <button id="navTabPipe" type="button" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 btn-touch">
+        <i data-lucide="gauge" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Velocity Pipa</span>
+      </button>
+
+      <button id="navTabCooling" type="button" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 btn-touch">
+        <i data-lucide="snowflake" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Cooling AC</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- JAVASCRIPT CORE ENGINE -->
+  <script>
+    // --- DEFINISI BASIS DATA KONVERSI SATUAN LENGKAP ---
+    const CONVERTER_CATEGORIES = {
+      length: {
+        id: 'length',
+        name: 'Panjang',
+        icon: 'ruler',
+        base: 'm',
+        units: {
+          m: { label: 'Meter (m)', factor: 1 },
+          km: { label: 'Kilometer (km)', factor: 1000 },
+          cm: { label: 'Centimeter (cm)', factor: 0.01 },
+          mm: { label: 'Milimeter (mm)', factor: 0.001 },
+          in: { label: 'Inci (inch)', factor: 0.0254 },
+          ft: { label: 'Kaki (feet / ft)', factor: 0.3048 },
+          yd: { label: 'Yard (yd)', factor: 0.9144 },
+          mi: { label: 'Mil (mile)', factor: 1609.344 }
+        }
+      },
+      mass: {
+        id: 'mass',
+        name: 'Massa & Berat',
+        icon: 'scale',
+        base: 'kg',
+        units: {
+          kg: { label: 'Kilogram (kg)', factor: 1 },
+          g: { label: 'Gram (g)', factor: 0.001 },
+          mg: { label: 'Miligram (mg)', factor: 0.000001 },
+          ton: { label: 'Metrik Ton (t)', factor: 1000 },
+          lb: { label: 'Pound (lbs)', factor: 0.45359237 },
+          oz: { label: 'Ounce (oz)', factor: 0.028349523125 }
+        }
+      },
+      temp: {
+        id: 'temp',
+        name: 'Suhu',
+        icon: 'thermometer',
+        isSpecialTemp: true,
+        units: {
+          c: { label: 'Celsius (°C)', symbol: '°C' },
+          f: { label: 'Fahrenheit (°F)', symbol: '°F' },
+          k: { label: 'Kelvin (K)', symbol: 'K' },
+          r: { label: 'Rankine (°R)', symbol: '°R' }
+        }
+      },
+      speed: {
+        id: 'speed',
+        name: 'Kecepatan / Velocity',
+        icon: 'gauge',
+        base: 'ms',
+        units: {
+          ms: { label: 'Meter/Detik (m/s)', factor: 1 },
+          kmh: { label: 'Kilometer/Jam (km/h)', factor: 1 / 3.6 },
+          fts: { label: 'Feet/Detik (ft/s)', factor: 0.3048 },
+          fpm: { label: 'Feet/Menit (FPM / ft/min)', factor: 0.00508 },
+          mph: { label: 'Mil/Jam (mph)', factor: 0.44704 },
+          knot: { label: 'Knot (Mil Laut/Jam)', factor: 0.514444 },
+          mach: { label: 'Mach (Kondisi Udara)', factor: 340.29 }
+        }
+      },
+      pressure: {
+        id: 'pressure',
+        name: 'Tekanan',
+        icon: 'gauge-circle',
+        base: 'pa',
+        units: {
+          pa: { label: 'Pascal (Pa)', factor: 1 },
+          kpa: { label: 'Kilopascal (kPa)', factor: 1000 },
+          bar: { label: 'Bar (bar)', factor: 100000 },
+          psi: { label: 'PSI (lbf/in²)', factor: 6894.757 },
+          atm: { label: 'Atmosfer Standar (atm)', factor: 101325 },
+          mmh2o: { label: 'mmH2O (milimeter air)', factor: 9.80665 },
+          inhg: { label: 'inHg (inci air raksa)', factor: 3386.389 }
+        }
+      },
+      flow: {
+        id: 'flow',
+        name: 'Debit Aliran (Flow)',
+        icon: 'waves',
+        base: 'lps',
+        units: {
+          lps: { label: 'Liter / Detik (L/s)', factor: 1 },
+          lpm: { label: 'Liter / Menit (LPM)', factor: 1 / 60 },
+          m3h: { label: 'Meter Kubik / Jam (m³/h)', factor: 1000 / 3600 },
+          gpm: { label: 'Gallon per Minute (GPM US)', factor: 3.78541 / 60 },
+          cfm: { label: 'Cubic Feet / Min (CFM)', factor: 28.3168 / 60 }
+        }
+      },
+      energy: {
+        id: 'energy',
+        name: 'Daya & Energi',
+        icon: 'zap',
+        base: 'w',
+        units: {
+          w: { label: 'Watt (W)', factor: 1 },
+          kw: { label: 'Kilowatt (kW)', factor: 1000 },
+          hp: { label: 'Horsepower / PK (HP)', factor: 745.699872 },
+          btuh: { label: 'BTU per Hour (BTU/h)', factor: 0.293071 },
+          tr: { label: 'Ton Ref (TR - 12k BTU/h)', factor: 3516.853 },
+          kwh: { label: 'Kilowatt-Hour (kWh)', factor: 3600000 }
+        }
+      },
+      area: {
+        id: 'area',
+        name: 'Luas',
+        icon: 'grid',
+        base: 'm2',
+        units: {
+          m2: { label: 'Meter Persegi (m²)', factor: 1 },
+          km2: { label: 'Kilometer Persegi (km²)', factor: 1000000 },
+          cm2: { label: 'Centimeter Persegi (cm²)', factor: 0.0001 },
+          ha: { label: 'Hektar (ha)', factor: 10000 },
+          are: { label: 'Are (a)', factor: 100 },
+          acre: { label: 'Acre (ac)', factor: 4046.856422 },
+          sqft: { label: 'Kaki Persegi (ft²)', factor: 0.092903 }
+        }
+      },
+      volume: {
+        id: 'volume',
+        name: 'Volume',
+        icon: 'box',
+        base: 'l',
+        units: {
+          l: { label: 'Liter (L)', factor: 1 },
+          ml: { label: 'Mililiter (mL)', factor: 0.001 },
+          m3: { label: 'Meter Kubik (m³)', factor: 1000 },
+          cm3: { label: 'Centimeter Kubik (cm³ / cc)', factor: 0.001 },
+          gal_us: { label: 'Galon US (gal)', factor: 3.78541 },
+          cuft: { label: 'Cubic Feet (ft³)', factor: 28.3168 }
+        }
+      }
+    };
+
+    // State Aplikasi
+    let currentCategory = 'length';
+    let currentView = 'standard'; // 'standard', 'pipe', 'cooling'
+    let currentPrecision = '4';
+    let pipeGeometry = 'round'; // 'round' atau 'rect'
+    let coolingMethod = 'room'; // 'room' atau 'hydronic'
+
+    // Element References
+    const categoryContainer = document.getElementById('categoryContainer');
+    const standardConverterView = document.getElementById('standardConverterView');
+    const pipeCalculatorView = document.getElementById('pipeCalculatorView');
+    const coolingCalculatorView = document.getElementById('coolingCalculatorView');
+
+    const inputValue = document.getElementById('inputValue');
+    const fromUnitSelect = document.getElementById('fromUnitSelect');
+    const outputValue = document.getElementById('outputValue');
+    const toUnitSelect = document.getElementById('toUnitSelect');
+    const swapUnitsBtn = document.getElementById('swapUnitsBtn');
+    const clearInputBtn = document.getElementById('clearInputBtn');
+    const copyResultBtn = document.getElementById('copyResultBtn');
+    const allUnitsGrid = document.getElementById('allUnitsGrid');
+    const precisionSelect = document.getElementById('precisionSelect');
+    const themeToggle = document.getElementById('themeToggle');
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMsg = document.getElementById('toastMsg');
+
+    // Bottom Navigation Elements
+    const navTabConvert = document.getElementById('navTabConvert');
+    const navTabPipe = document.getElementById('navTabPipe');
+    const navTabCooling = document.getElementById('navTabCooling');
+
+    // Pipe Calculator Elements
+    const geoRoundBtn = document.getElementById('geoRoundBtn');
+    const geoRectBtn = document.getElementById('geoRectBtn');
+    const roundInputWrap = document.getElementById('roundInputWrap');
+    const rectInputWrap = document.getElementById('rectInputWrap');
+    const pipeFlowInput = document.getElementById('pipeFlowInput');
+    const pipeFlowUnit = document.getElementById('pipeFlowUnit');
+    const pipeDiameterInput = document.getElementById('pipeDiameterInput');
+    const pipeDiameterUnit = document.getElementById('pipeDiameterUnit');
+    const ductWidthInput = document.getElementById('ductWidthInput');
+    const ductHeightInput = document.getElementById('ductHeightInput');
+    const calcCrossArea = document.getElementById('calcCrossArea');
+    const velResMS = document.getElementById('velResMS');
+    const velResFPM = document.getElementById('velResFPM');
+    const velResFPS = document.getElementById('velResFPS');
+    const velResKMH = document.getElementById('velResKMH');
+    const velocityStatusTag = document.getElementById('velocityStatusTag');
+    const guidelineRangeText = document.getElementById('guidelineRangeText');
+    const guidelineFeedbackText = document.getElementById('guidelineFeedbackText');
+    const flowContextBadge = document.getElementById('flowContextBadge');
+
+    // Cooling Calculator Elements
+    const clModeRoomBtn = document.getElementById('clModeRoomBtn');
+    const clModeHydronicBtn = document.getElementById('clModeHydronicBtn');
+    const clRoomFormContainer = document.getElementById('clRoomFormContainer');
+    const clHydronicFormContainer = document.getElementById('clHydronicFormContainer');
+    const clAreaVal = document.getElementById('clAreaVal');
+    const clAreaUnit = document.getElementById('clAreaUnit');
+    const clHeightVal = document.getElementById('clHeightVal');
+    const clHeightUnit = document.getElementById('clHeightUnit');
+    const clPresetRoom = document.getElementById('clPresetRoom');
+    const clPeopleCount = document.getElementById('clPeopleCount');
+    const clWattsLoad = document.getElementById('clWattsLoad');
+    const clSunExposure = document.getElementById('clSunExposure');
+    const clChillerFlowVal = document.getElementById('clChillerFlowVal');
+    const clChillerFlowUnit = document.getElementById('clChillerFlowUnit');
+    const clChwsTemp = document.getElementById('clChwsTemp');
+    const clChwrTemp = document.getElementById('clChwrTemp');
+    const clMethodTag = document.getElementById('clMethodTag');
+    const clResPkDisplay = document.getElementById('clResPkDisplay');
+    const clResBtuDisplay = document.getElementById('clResBtuDisplay');
+    const clResTrDisplay = document.getElementById('clResTrDisplay');
+    const clResKwDisplay = document.getElementById('clResKwDisplay');
+    const clSuggestUnitText = document.getElementById('clSuggestUnitText');
+    const clSuggestDescText = document.getElementById('clSuggestDescText');
+
+    // --- HELPER FORMAT ANGKA ---
+    function formatValue(num) {
+      if (isNaN(num) || !isFinite(num)) return '0';
+      if (num === 0) return '0';
+
+      if (currentPrecision === 'auto') {
+        if (Math.abs(num) < 0.0001 || Math.abs(num) >= 1e9) {
+          return num.toExponential(4);
+        }
+        return parseFloat(num.toPrecision(6)).toString();
+      }
+
+      const p = parseInt(currentPrecision, 10);
+      if (Math.abs(num) < Math.pow(10, -p) && num !== 0) {
+        return num.toExponential(3);
+      }
+      return num.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: p
+      });
+    }
+
+    // --- TOAST COPY HELPER ---
+    function showToast(text) {
+      toastMsg.textContent = text;
+      toastNotification.classList.remove('opacity-0');
+      toastNotification.classList.add('opacity-100');
+      setTimeout(() => {
+        toastNotification.classList.remove('opacity-100');
+        toastNotification.classList.add('opacity-0');
+      }, 1800);
+    }
+
+    function copyToClipboard(text, label = 'Data') {
+      try {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showToast(`${label} disalin!`);
+      } catch (err) {
+        console.error('Copy failed', err);
+      }
+    }
+
+    // --- INISIALISASI TABS HORIZONTAL CATEGORIES ---
+    function renderCategoryTabs() {
+      categoryContainer.innerHTML = '';
+
+      // Tambahkan kategori kalkulator standar
+      Object.keys(CONVERTER_CATEGORIES).forEach((key) => {
+        const cat = CONVERTER_CATEGORIES[key];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.category = key;
+        const isActive = (currentView === 'standard' && currentCategory === key);
+
+        btn.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 btn-touch ${
+          isActive
+            ? 'bg-gradient-to-r from-brand-500 to-accent-600 text-white shadow-md shadow-brand-500/30'
+            : 'bg-surface-800 text-slate-400 hover:text-white border border-slate-700/80'
+        }`;
+        btn.innerHTML = `<i data-lucide="${cat.icon}" class="w-3.5 h-3.5"></i> <span>${cat.name}</span>`;
+
+        btn.addEventListener('click', () => {
+          switchView('standard');
+          currentCategory = key;
+          renderCategoryTabs();
+          populateDropdowns();
+          calculateStandard();
+          btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+
+        categoryContainer.appendChild(btn);
+      });
+
+      // Tab Spesial HVAC 1: Velocity Pipa
+      const pipeBtn = document.createElement('button');
+      pipeBtn.type = 'button';
+      pipeBtn.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 btn-touch ${
+        currentView === 'pipe'
+          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
+          : 'bg-surface-800 text-indigo-300 hover:text-white border border-indigo-700/40'
+      }`;
+      pipeBtn.innerHTML = `<i data-lucide="gauge" class="w-3.5 h-3.5"></i> <span>Velocity Pipa/Duct</span>`;
+      pipeBtn.addEventListener('click', () => {
+        switchView('pipe');
+        pipeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+      categoryContainer.appendChild(pipeBtn);
+
+      // Tab Spesial HVAC 2: Cooling Load AC
+      const coolBtn = document.createElement('button');
+      coolBtn.type = 'button';
+      coolBtn.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 btn-touch ${
+        currentView === 'cooling'
+          ? 'bg-cyan-600 text-white shadow-md shadow-cyan-500/30'
+          : 'bg-surface-800 text-cyan-300 hover:text-white border border-cyan-700/40'
+      }`;
+      coolBtn.innerHTML = `<i data-lucide="snowflake" class="w-3.5 h-3.5"></i> <span>Cooling Load AC</span>`;
+      coolBtn.addEventListener('click', () => {
+        switchView('cooling');
+        coolBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+      categoryContainer.appendChild(coolBtn);
+
+      // Re-trigger icon rendering
+      lucide.createIcons();
+    }
+
+    // --- SETUP MOUSE DRAG SCROLL PADA TAB KATEGORI (DESKTOP USER FRIENDLY) ---
+    function setupDragScroll(slider) {
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+
+      slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+      });
+      slider.addEventListener('mouseleave', () => isDown = false);
+      slider.addEventListener('mouseup', () => isDown = false);
+      slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        slider.scrollLeft = scrollLeft - walk;
+      });
+    }
+
+    // --- SWITCH VIEW (Standard, Pipe, Cooling) ---
+    function switchView(viewName) {
+      currentView = viewName;
+      standardConverterView.classList.add('hidden');
+      pipeCalculatorView.classList.add('hidden');
+      coolingCalculatorView.classList.add('hidden');
+
+      // Update Bottom Bar Style
+      [navTabConvert, navTabPipe, navTabCooling].forEach(b => {
+        b.className = 'flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 btn-touch';
+      });
+
+      if (viewName === 'standard') {
+        standardConverterView.classList.remove('hidden');
+        navTabConvert.className = 'flex flex-col items-center gap-1 text-brand-400 btn-touch';
+        calculateStandard();
+      } else if (viewName === 'pipe') {
+        pipeCalculatorView.classList.remove('hidden');
+        navTabPipe.className = 'flex flex-col items-center gap-1 text-indigo-400 btn-touch';
+        calculatePipeVelocity();
+      } else if (viewName === 'cooling') {
+        coolingCalculatorView.classList.remove('hidden');
+        navTabCooling.className = 'flex flex-col items-center gap-1 text-cyan-400 btn-touch';
+        calculateCoolingLoad();
+      }
+
+      renderCategoryTabs();
+    }
+
+    // --- POPULATE DROPDOWNS FOR STANDARD CONVERTER ---
+    function populateDropdowns() {
+      const cat = CONVERTER_CATEGORIES[currentCategory];
+      const keys = Object.keys(cat.units);
+
+      fromUnitSelect.innerHTML = '';
+      toUnitSelect.innerHTML = '';
+
+      keys.forEach((k, index) => {
+        const u = cat.units[k];
+        const optFrom = new Option(u.label, k);
+        const optTo = new Option(u.label, k);
+
+        fromUnitSelect.add(optFrom);
+        toUnitSelect.add(optTo);
+      });
+
+      // Default selection
+      fromUnitSelect.selectedIndex = 0;
+      toUnitSelect.selectedIndex = keys.length > 1 ? 1 : 0;
+    }
+
+    // --- LOGIKA KONVERSI SUHU ---
+    function convertTemperature(val, from, to) {
+      if (from === to) return val;
+      // Step 1: ke Celsius
+      let celsius;
+      if (from === 'c') celsius = val;
+      else if (from === 'f') celsius = (val - 32) * (5 / 9);
+      else if (from === 'k') celsius = val - 273.15;
+      else if (from === 'r') celsius = (val - 491.67) * (5 / 9);
+
+      // Step 2: dari Celsius ke target
+      if (to === 'c') return celsius;
+      if (to === 'f') return celsius * (9 / 5) + 32;
+      if (to === 'k') return celsius + 273.15;
+      if (to === 'r') return (celsius + 273.15) * (9 / 5);
+      return celsius;
+    }
+
+    // --- KALKULASI KONVERSI STANDAR REAL-TIME ---
+    function calculateStandard() {
+      const cat = CONVERTER_CATEGORIES[currentCategory];
+      const val = parseFloat(inputValue.value);
+
+      if (isNaN(val)) {
+        outputValue.textContent = '0';
+        renderAllUnitsGrid(0);
+        return;
+      }
+
+      const fromKey = fromUnitSelect.value;
+      const toKey = toUnitSelect.value;
+      let result = 0;
+
+      if (cat.isSpecialTemp) {
+        result = convertTemperature(val, fromKey, toKey);
+      } else {
+        const fromFactor = cat.units[fromKey].factor;
+        const toFactor = cat.units[toKey].factor;
+        const baseValue = val * fromFactor;
+        result = baseValue / toFactor;
+      }
+
+      outputValue.textContent = formatValue(result);
+      renderAllUnitsGrid(val);
+    }
+
+    // --- RENDER SEMUA SATUAN SEKALIGUS (GRID LIST) ---
+    function renderAllUnitsGrid(inputVal) {
+      allUnitsGrid.innerHTML = '';
+      const cat = CONVERTER_CATEGORIES[currentCategory];
+      const fromKey = fromUnitSelect.value;
+
+      Object.keys(cat.units).forEach((uKey) => {
+        const unit = cat.units[uKey];
+        let valCalculated = 0;
+
+        if (cat.isSpecialTemp) {
+          valCalculated = convertTemperature(inputVal, fromKey, uKey);
+        } else {
+          const fromFactor = cat.units[fromKey].factor;
+          const toFactor = unit.factor;
+          valCalculated = (inputVal * fromFactor) / toFactor;
+        }
+
+        const formatted = formatValue(valCalculated);
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-surface-800/80 hover:bg-surface-800 border border-slate-700/60 transition';
+        item.innerHTML = `
+          <div class="truncate pr-2">
+            <div class="text-[11px] font-semibold text-slate-300 truncate">${unit.label}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-xs font-mono font-bold text-brand-300">${formatted}</span>
+            <button class="p-1 rounded text-slate-400 hover:text-brand-400 hover:bg-surface-700 transition" title="Salin Angka">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+
+        item.querySelector('button').addEventListener('click', () => {
+          copyToClipboard(`${formatted} ${unit.label}`, unit.label);
+        });
+
+        allUnitsGrid.appendChild(item);
+      });
+
+      lucide.createIcons();
+    }
+
+    // --- MODUL 1: KALKULASI VELOCITY PIPA / DUCTING ---
+    function calculatePipeVelocity() {
+      const flowVal = parseFloat(pipeFlowInput.value) || 0;
+      let flowM3S = 0; // m³/s
+
+      // Normalisasi Flow Rate ke m³/s
+      switch (pipeFlowUnit.value) {
+        case 'lps': flowM3S = flowVal / 1000; break;
+        case 'lpm': flowM3S = flowVal / 60000; break;
+        case 'm3h': flowM3S = flowVal / 3600; break;
+        case 'gpm': flowM3S = (flowVal * 0.00378541) / 60; break;
+        case 'cfm': flowM3S = (flowVal * 0.0283168) / 60; break;
+      }
+
+      let areaM2 = 0; // Luas Penampang m²
+
+      if (pipeGeometry === 'round') {
+        const dVal = parseFloat(pipeDiameterInput.value) || 0;
+        let dMeters = dVal;
+        switch (pipeDiameterUnit.value) {
+          case 'mm': dMeters = dVal / 1000; break;
+          case 'cm': dMeters = dVal / 100; break;
+          case 'inch': dMeters = dVal * 0.0254; break;
+          case 'm': dMeters = dVal; break;
+        }
+        areaM2 = Math.PI * Math.pow(dMeters / 2, 2);
+      } else {
+        const wVal = (parseFloat(ductWidthInput.value) || 0) / 1000; // default mm ke m
+        const hVal = (parseFloat(ductHeightInput.value) || 0) / 1000;
+        areaM2 = wVal * hVal;
+      }
+
+      calcCrossArea.textContent = `${areaM2.toFixed(5)} m²`;
+
+      // Hitung Velocity v = Q / A
+      let velMS = 0;
+      if (areaM2 > 0) {
+        velMS = flowM3S / areaM2;
+      }
+
+      const velFPM = velMS * 196.85;
+      const velFPS = velMS * 3.28084;
+      const velKMH = velMS * 3.6;
+
+      velResMS.textContent = velMS.toFixed(2);
+      velResFPM.textContent = Math.round(velFPM).toLocaleString('id-ID');
+      velResFPS.textContent = velFPS.toFixed(2);
+      velResKMH.textContent = velKMH.toFixed(2);
+
+      // Evaluasi Kriteria Velocity (Air vs Udara)
+      const isAir = (pipeFlowUnit.value === 'cfm' || pipeGeometry === 'rect');
+
+      if (!isAir) {
+        // Water Pipe Standard (1.2 - 2.4 m/s optimal)
+        flowContextBadge.textContent = 'Pipa Air (Water)';
+        guidelineRangeText.textContent = '1.2 - 2.4 m/s (Standar Chilled Water)';
+
+        if (velMS < 0.6) {
+          velocityStatusTag.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          velocityStatusTag.textContent = 'Terlalu Rendah';
+          guidelineFeedbackText.textContent = 'Kecepatan < 0.6 m/s dapat menyebabkan pengendapan lumpur/sedimen pada pipa.';
+        } else if (velMS <= 2.5) {
+          velocityStatusTag.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          velocityStatusTag.textContent = 'Optimal (Ideal)';
+          guidelineFeedbackText.textContent = 'Kecepatan aliran sangat baik, friksi dan kebisingan hidronik rendah.';
+        } else {
+          velocityStatusTag.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30';
+          velocityStatusTag.textContent = 'Terlalu Tinggi';
+          guidelineFeedbackText.textContent = 'Peringatan: Berpotensi terjadi erosi dinding pipa, water hammer, dan head loss pompa boros listrik.';
+        }
+      } else {
+        // Air Duct Standard (Main Duct: 5-8 m/s, Branch: 3-5 m/s)
+        flowContextBadge.textContent = 'Ducting Udara (Air)';
+        guidelineRangeText.textContent = '4.0 - 7.5 m/s (Main Ducting Standar)';
+
+        if (velMS < 2.5) {
+          velocityStatusTag.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30';
+          velocityStatusTag.textContent = 'Kecepatan Rendah (Oversized)';
+          guidelineFeedbackText.textContent = 'Ukuran ducting sangat longgar, aliran udara sangat senyap namun membutuhkan material besar.';
+        } else if (velMS <= 7.5) {
+          velocityStatusTag.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          velocityStatusTag.textContent = 'Ideal (Komersil)';
+          guidelineFeedbackText.textContent = 'Kecepatan udara optimal untuk ducting suplai gedung komersial dan kantor.';
+        } else {
+          velocityStatusTag.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30';
+          velocityStatusTag.textContent = 'Bising / High Velocity';
+          guidelineFeedbackText.textContent = 'Kecepatan udara tinggi dapat menimbulkan desisan bising pada diffuser dan getaran ducting.';
+        }
+      }
+    }
+
+    // --- MODUL 2: KALKULASI BEBAN COOLING LOAD AC & CHILLER ---
+    function calculateCoolingLoad() {
+      let btuPerHour = 0;
+
+      if (coolingMethod === 'room') {
+        clMethodTag.textContent = 'Metode Ruangan (AC Split)';
+
+        let areaM2 = parseFloat(clAreaVal.value) || 0;
+        if (clAreaUnit.value === 'sqft') areaM2 *= 0.092903;
+
+        let heightM = parseFloat(clHeightVal.value) || 2.8;
+        if (clHeightUnit.value === 'ft') heightM *= 0.3048;
+
+        const heightFactor = Math.max(1.0, heightM / 2.8);
+
+        // Nilai dasar BTU/h per m²
+        let baseRate = 530;
+        switch (clPresetRoom.value) {
+          case 'bedroom': baseRate = 530; break;
+          case 'living': baseRate = 620; break;
+          case 'office': baseRate = 720; break;
+          case 'restaurant': baseRate = 880; break;
+          case 'server': baseRate = 1200; break;
+        }
+
+        const roomSensible = areaM2 * baseRate * heightFactor;
+        const occupantsLoad = (parseFloat(clPeopleCount.value) || 0) * 500;
+        const electricalLoad = (parseFloat(clWattsLoad.value) || 0) * 3.41214;
+
+        let sunMultiplier = 1.0;
+        switch (clSunExposure.value) {
+          case 'shaded': sunMultiplier = 0.90; break;
+          case 'normal': sunMultiplier = 1.0; break;
+          case 'sunny': sunMultiplier = 1.15; break;
+          case 'rooftop': sunMultiplier = 1.25; break;
+        }
+
+        btuPerHour = (roomSensible + occupantsLoad + electricalLoad) * sunMultiplier;
+
+      } else {
+        // Metode Chiller Hidronik Q = Flow x 500 x Delta_T(F)
+        clMethodTag.textContent = 'Metode Chiller (Hidronik)';
+
+        const flow = parseFloat(clChillerFlowVal.value) || 0;
+        const t1 = parseFloat(clChwsTemp.value) || 0;
+        const t2 = parseFloat(clChwrTemp.value) || 0;
+        const isF = document.querySelector('input[name="clTempScale"]:checked').value === 'F';
+
+        let flowGpm = flow;
+        switch (clChillerFlowUnit.value) {
+          case 'gpm': flowGpm = flow; break;
+          case 'lpm': flowGpm = flow * 0.264172; break;
+          case 'lps': flowGpm = flow * 15.8503; break;
+          case 'm3h': flowGpm = flow * 4.40287; break;
+        }
+
+        const deltaT = Math.abs(t2 - t1);
+        const deltaTF = isF ? deltaT : deltaT * 1.8;
+
+        btuPerHour = flowGpm * 500 * deltaTF;
+      }
+
+      // Konversi Satuan Pendingin
+      const trVal = btuPerHour / 12000;
+      const kwVal = btuPerHour * 0.000293071;
+      const pkCalculated = btuPerHour / 9000;
+
+      clResBtuDisplay.textContent = Math.round(btuPerHour).toLocaleString('id-ID');
+      clResTrDisplay.textContent = `${trVal.toFixed(2)} TR`;
+      clResKwDisplay.textContent = `${kwVal.toFixed(2)} kW`;
+      clResPkDisplay.textContent = `${pkCalculated.toFixed(2)} PK`;
+
+      // Saran Ukuran Unit AC Pasar Indonesia
+      let recPK = '1/2 PK (5.000 BTU/h)';
+      let recDesc = 'Kapasitas hemat energi untuk kamar tidur kecil dengan beban ringan.';
+
+      if (btuPerHour <= 5500) {
+        recPK = '1/2 PK (5.000 BTU/h)';
+        recDesc = 'Ukuran ringkas pas untuk kamar tidur anak atau ruang belajar.';
+      } else if (btuPerHour <= 7500) {
+        recPK = '3/4 PK (7.000 BTU/h)';
+        recDesc = 'Cocok untuk kamar tidur standar agar cepat dingin.';
+      } else if (btuPerHour <= 10000) {
+        recPK = '1 PK (9.000 BTU/h)';
+        recDesc = 'Pilihan paling ideal untuk kamar utama atau ruang keluarga sedang.';
+      } else if (btuPerHour <= 13500) {
+        recPK = '1.5 PK (12.000 BTU/h)';
+        recDesc = 'Sangat direkomendasikan untuk ruang kerja, ruko, atau ruang keluarga terbuka.';
+      } else if (btuPerHour <= 19500) {
+        recPK = '2 PK (18.000 BTU/h)';
+        recDesc = 'Kapasitas besar untuk ruang tamu lapang atau ruang rapat kantor.';
+      } else if (btuPerHour <= 25000) {
+        recPK = '2.5 PK (24.000 BTU/h)';
+        recDesc = 'Disarankan AC Split Wall besar atau Floor Standing komersil.';
+      } else {
+        const pkCeil = Math.ceil(pkCalculated);
+        recPK = `${trVal.toFixed(1)} TR / ${pkCeil} PK Multi-Split`;
+        recDesc = 'Beban tinggi, direkomendasikan AC Cassette, VRF/VRV, atau Chiller sentral.';
+      }
+
+      clSuggestUnitText.textContent = recPK;
+      clSuggestDescText.textContent = recDesc;
+    }
+
+    // --- EVENT LISTENERS INITIALIZATION ---
+    function initEventListeners() {
+      // Input Standard Converter
+      inputValue.addEventListener('input', calculateStandard);
+      fromUnitSelect.addEventListener('change', calculateStandard);
+      toUnitSelect.addEventListener('change', calculateStandard);
+
+      // Swap Satuan
+      swapUnitsBtn.addEventListener('click', () => {
+        const temp = fromUnitSelect.value;
+        fromUnitSelect.value = toUnitSelect.value;
+        toUnitSelect.value = temp;
+        calculateStandard();
+      });
+
+      // Clear Input
+      clearInputBtn.addEventListener('click', () => {
+        inputValue.value = '1';
+        calculateStandard();
+      });
+
+      // Salin Nilai Output Utama
+      copyResultBtn.addEventListener('click', () => {
+        const uText = toUnitSelect.options[toUnitSelect.selectedIndex].text;
+        copyToClipboard(`${outputValue.textContent} ${uText}`, 'Hasil');
+      });
+
+      // Precision Change
+      precisionSelect.addEventListener('change', (e) => {
+        currentPrecision = e.target.value;
+        calculateStandard();
+      });
+
+      // Dark / Light Theme Toggle
+      themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        document.getElementById('themeIconSun').classList.toggle('hidden', isDark);
+        document.getElementById('themeIconMoon').classList.toggle('hidden', !isDark);
+      });
+
+      // Bottom Bar Navigation
+      navTabConvert.addEventListener('click', () => switchView('standard'));
+      navTabPipe.addEventListener('click', () => switchView('pipe'));
+      navTabCooling.addEventListener('click', () => switchView('cooling'));
+
+      // Event Listeners: Pipe Calculator
+      geoRoundBtn.addEventListener('click', () => {
+        pipeGeometry = 'round';
+        geoRoundBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-1.5';
+        geoRectBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+        roundInputWrap.classList.remove('hidden');
+        rectInputWrap.classList.add('hidden');
+        calculatePipeVelocity();
+      });
+
+      geoRectBtn.addEventListener('click', () => {
+        pipeGeometry = 'rect';
+        geoRectBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-1.5';
+        geoRoundBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+        rectInputWrap.classList.remove('hidden');
+        roundInputWrap.classList.add('hidden');
+        calculatePipeVelocity();
+      });
+
+      [pipeFlowInput, pipeFlowUnit, pipeDiameterInput, pipeDiameterUnit, ductWidthInput, ductHeightInput].forEach(el => {
+        el.addEventListener('input', calculatePipeVelocity);
+        el.addEventListener('change', calculatePipeVelocity);
+      });
+
+      // Event Listeners: Cooling Load Calculator
+      clModeRoomBtn.addEventListener('click', () => {
+        coolingMethod = 'room';
+        clModeRoomBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition flex items-center justify-center gap-1.5';
+        clModeHydronicBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+        clRoomFormContainer.classList.remove('hidden');
+        clHydronicFormContainer.classList.add('hidden');
+        calculateCoolingLoad();
+      });
+
+      clModeHydronicBtn.addEventListener('click', () => {
+        coolingMethod = 'hydronic';
+        clModeHydronicBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition flex items-center justify-center gap-1.5';
+        clModeRoomBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+        clHydronicFormContainer.classList.remove('hidden');
+        clRoomFormContainer.classList.add('hidden');
+        calculateCoolingLoad();
+      });
+
+      [clAreaVal, clAreaUnit, clHeightVal, clHeightUnit, clPresetRoom, clPeopleCount, clWattsLoad, clSunExposure, clChillerFlowVal, clChillerFlowUnit, clChwsTemp, clChwrTemp].forEach(el => {
+        el.addEventListener('input', calculateCoolingLoad);
+        el.addEventListener('change', calculateCoolingLoad);
+      });
+
+      document.querySelectorAll('input[name="clTempScale"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          document.querySelectorAll('.clTempSymbol').forEach(lbl => {
+            lbl.textContent = `°${e.target.value}`;
+          });
+          calculateCoolingLoad();
+        });
+      });
+
+      document.querySelectorAll('.clCopyBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tId = btn.getAttribute('data-target');
+          const lbl = btn.getAttribute('data-label');
+          const txt = document.getElementById(tId).textContent;
+          copyToClipboard(`${txt} ${lbl}`, 'Kapasitas');
+        });
+      });
+
+      setupDragScroll(categoryContainer);
+    }
+
+    // --- APPLICATION BOOTSTRAP ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCategoryTabs();
+      populateDropdowns();
+      calculateStandard();
+      calculatePipeVelocity();
+      calculateCoolingLoad();
+      initEventListeners();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
