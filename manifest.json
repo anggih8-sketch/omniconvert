@@ -13,6 +13,32 @@
   "lang": "id",
   "dir": "ltr",
   "categories": ["utilities", "productivity", "education"],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "file_handlers": [
+    {
+      "action": "/omniconvert/",
+      "name": "File Konfigurasi OmniConvert",
+      "accept": {
+        "text/plain": [".txt"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/omniconvert/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "note_taking": {
+    "new_note_url": "/omniconvert/"
+  },
   "icons": [
     {
       "src": "https://img.icons8.com/ios-filled/192/38bdf8/speed.png",
